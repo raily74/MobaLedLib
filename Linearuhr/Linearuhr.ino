@@ -24,8 +24,8 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 7200, 60000);
 
 // Wi-Fi Settings
-const char *wifi_ssid = "raily74";
-const char *wifi_password = "2q$Wh+3Tm6vKk/]$usAsx66J";
+const char *wifi_ssid = "YourSSID";
+const char *wifi_password = "YourPassword";
 const char* NTP_SERVER = "de.pool.ntp.org";
 const char* TZ_INFO    = "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00";
 
