@@ -1,12 +1,12 @@
 /*
-  Project:  Linearuhr von NTC Zeit Server mit ESP32
-  Author:   Michael Todtenbier
-  Date:     Created 02.07.2024
-  Version:  V1.0
-  IDE:      Arduino IDE 1.8.19
+  Project: Linearuhr von NTC Zeit Server mit ESP32
+  Author: Michael Todtenbier
+  Date: Created 02.07.2024
+  Version: V1.0
+  IDE: Arduino IDE 1.8.19
 
   Required libraries (sketch -> include library -> manage libraries)
-  -
+  -Grüße aus Flensburg
 */
 
 #include <WiFi.h>
@@ -15,9 +15,9 @@
 //#include <Adafruit_NeoPixel.h>
 #include <FastLED.h>
 
-#define DATA_PIN  27 // Pin für LED-Streifen
-#define NUM_LEDS  14 // Anzahl der WS2811-Chips
-// This is an array of leds.  One item for each led in your strip.
+#define DATA_PIN 27 // Pin für LED-Streifen
+const byte NUM_LEDS = 14; // Anzahl der WS2811-Chips
+// This is an array of leds. One item for each led in your strip.
 CRGB leds[NUM_LEDS];
 
 WiFiUDP ntpUDP;
@@ -27,13 +27,12 @@ NTPClient timeClient(ntpUDP, "pool.ntp.org", 7200, 60000);
 const char *wifi_ssid = "YourSSID";
 const char *wifi_password = "YourPassword";
 const char* NTP_SERVER = "de.pool.ntp.org";
-const char* TZ_INFO    = "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00";
+const char* TZ_INFO = "CET-1CEST-2,M3.5.0/02:00:00,M10.5.0/03:00:00";
 
 /*
-time_t now;
-tm tm;
+  time_t now;
+  tm tm;
 */
-
 
 void setup () {
   Serial.begin(115200);
@@ -54,285 +53,75 @@ void setup () {
 
   // NTP Client starten
   timeClient.begin();
-  
-/*
-  // LED-Streifen initialisieren
-  strip.begin();
-  strip.show(); // Initialize all pixels to 'off'
-*/
 }
-
-/*
-// Funktion zum Setzen der LEDs basierend auf der Zeit
-void setTimeLEDs(int value, int startChip, int chipCount, uint32_t color) {
-  int activeChips = map(value, 0, 59, 0, chipCount);
-  for (int i = 0; i < chipCount; i++) {
-    if (i < activeChips) {
-      strip.setPixelColor(startChip + i, color);
-    } else {
-      strip.setPixelColor(startChip + i, strip.Color(0, 0, 0));
-    }
-  }
-}
-*/
 
 void loop () {
-
   timeClient.update();
 
-  int hours = timeClient.getHours();
-  int minutes = timeClient.getMinutes();
-  int seconds = timeClient.getSeconds();
+  byte hoursH = timeClient.getHours() / 10;
+  byte hoursL = timeClient.getHours() % 10;
+  byte minutesH = timeClient.getMinutes() / 10;
+  byte minutesL = timeClient.getMinutes() % 10;
+  byte secondsH = timeClient.getSeconds() / 10;
+  byte secondsL = timeClient.getSeconds() % 10;
 
-  Serial.printf(" \tUhrzeit: %02d:%02d:%02d \n", hours, minutes, seconds);
-               
+//  Serial.printf(" \tUhrzeit: %02d:%02d:%02d \n", hours, minutes, seconds);
+  for (int i = 0; i < NUM_LEDS; i++)leds[i] = CRGB::Black;
+
+
   //Zehnerstunden
-  if (((hours / 10) % 10) > 1) {
-     leds[13] = CRGB::Yellow;
-     FastLED.show();
-          
-  }
-  
-  else if (((hours / 10) % 10) > 0) {
-     leds[13] = CRGB::Red;
-     FastLED.show();
+  if (hoursH > 1) leds[13] = CRGB::Yellow;
+  else if (hoursH ) leds[13] = CRGB::Red;
 
-  }
- 
-  else {
-     leds[13] = CRGB::Black;
-     FastLED.show();
-}
-     
   //Einerstunden
-  if ((hours % 10) > 8) {
-     leds[12] = CRGB::White;
-     FastLED.show();
-  }
+  if (hoursL > 8) {leds[12] = CRGB::White; leds[11] = CRGB::White; leds[10] = CRGB::White;}
+  else if (hoursL > 7) {leds[12] = CRGB::Yellow; leds[11] = CRGB::White; leds[10] = CRGB::White;}
+  else if (hoursL > 6) {leds[12] = CRGB::Red; leds[11] = CRGB::White; leds[10] = CRGB::White;}
+  else if (hoursL > 5) {leds[11] = CRGB::White; leds[10] = CRGB::White;}
+  else if (hoursL > 4) {leds[11] = CRGB::Yellow; leds[10] = CRGB::White;}
+  else if (hoursL > 3) {leds[11] = CRGB::Red; leds[10] = CRGB::White;}
+  else if (hoursL > 2) leds[10] = CRGB::White;
+  else if (hoursL > 1) leds[10] = CRGB::Yellow;
+  else if (hoursL )leds[10] = CRGB::Red;
 
-  else if ((hours % 10) > 7) {
-     leds[12] = CRGB::Yellow;
-     FastLED.show();
-  }
-
-  else if ((hours % 10) > 6) {
-     leds[12] = CRGB::Red;
-     FastLED.show();
-  }
-  
-  else if ((hours % 10) > 5) {
-     leds[11] = CRGB::White;
-     FastLED.show();
-  }
-  else if ((hours % 10) > 4) {
-     leds[11] = CRGB::Yellow;
-     FastLED.show();
-  }
-
-  else if ((hours % 10) > 3) {
-     leds[11] = CRGB::Red;
-     FastLED.show();
-  }
-  
-  else if ((hours % 10) > 2) {
-     leds[10] = CRGB::White;
-     FastLED.show();
-  }
-
-  else if ((hours % 10) > 1) {
-     leds[10] = CRGB::Yellow;
-     FastLED.show();
-  }
-
-  else if ((hours % 10) > 0) {
-     leds[10] = CRGB::Red;
-     FastLED.show();
-  }
-   
-  else {
-     leds[12] = CRGB::Black;
-     FastLED.show();
-     leds[11] = CRGB::Black;
-     FastLED.show();
-     leds[10] = CRGB::Black;
-     FastLED.show();
-}
 
   //Zehnerminuten
-  if (((minutes / 10) % 10) > 4) {
-     leds[9] = CRGB::Yellow;
-     FastLED.show();
-  }
-  
-  else if (((minutes / 10) % 10) > 3) {
-     leds[9] = CRGB::Red;
-     FastLED.show();
-  }
-  
-  else if (((minutes / 10) % 10) > 2) {
-     leds[8] = CRGB::White;
-     FastLED.show();
-  }
-  
-  else if (((minutes / 10) % 10) > 1) {
-     leds[8] = CRGB::Yellow;
-     FastLED.show();
-          
-  }
-  
-  else if (((minutes / 10) % 10) > 0) {
-     leds[8] = CRGB::Red;
-     FastLED.show();
+  if ( minutesH > 4) {leds[9] = CRGB::Yellow; leds[8] = CRGB::White;}
+  else if ( minutesH > 3) {leds[9] = CRGB::Red; leds[8] = CRGB::White;}
+  else if ( minutesH > 2) leds[8] = CRGB::White;
+  else if ( minutesH > 1) leds[8] = CRGB::Yellow;
+  else if ( minutesH ) leds[8] = CRGB::Red;
 
-  }
- 
-  else {
-     leds[9] = CRGB::Black;
-     FastLED.show();
-     leds[8] = CRGB::Black;
-     FastLED.show();
-}
-     
   //Einerminuten
-  if ((minutes % 10) > 8) {
-     leds[7] = CRGB::White;
-     FastLED.show();
-  }
+  if ( minutesL > 8) {leds[7] = CRGB::White; leds[6] = CRGB::White; leds[5] = CRGB::White;}
+  else if ( minutesL > 7) {leds[7] = CRGB::Yellow; leds[6] = CRGB::White; leds[5] = CRGB::White;}
+  else if ( minutesL > 6) {leds[7] = CRGB::Red; leds[6] = CRGB::White; leds[5] = CRGB::White;}
+  else if ( minutesL > 5) {leds[6] = CRGB::White; leds[5] = CRGB::White;}
+  else if ( minutesL > 4) {leds[6] = CRGB::Yellow; leds[5] = CRGB::White;}
+  else if ( minutesL > 3) {leds[6] = CRGB::Red; leds[5] = CRGB::White;}
+  else if ( minutesL > 2) leds[5] = CRGB::White;
+  else if ( minutesL > 1) leds[5] = CRGB::Yellow;
+  else if ( minutesL )leds[5] = CRGB::Red;
 
-  else if ((minutes % 10) > 7) {
-     leds[7] = CRGB::Yellow;
-     FastLED.show();
-  }
 
-  else if ((minutes % 10) > 6) {
-     leds[7] = CRGB::Red;
-     FastLED.show();
-  }
-  
-  else if ((minutes % 10) > 5) {
-     leds[6] = CRGB::White;
-     FastLED.show();
-  }
-  else if ((minutes % 10) > 4) {
-     leds[6] = CRGB::Yellow;
-     FastLED.show();
-  }
-
-  else if ((minutes % 10) > 3) {
-     leds[6] = CRGB::Red;
-     FastLED.show();
-  }
-  
-  else if ((minutes % 10) > 2) {
-     leds[5] = CRGB::White;
-     FastLED.show();
-  }
-
-  else if ((minutes % 10) > 1) {
-     leds[5] = CRGB::Yellow;
-     FastLED.show();
-  }
-
-  else if ((minutes % 10) > 0) {
-     leds[5] = CRGB::Red;
-     FastLED.show();
-  }
-   
-  else {
-     leds[7] = CRGB::Black;
-     FastLED.show();
-     leds[6] = CRGB::Black;
-     FastLED.show();
-     leds[5] = CRGB::Black;
-     FastLED.show();
-
-}
   //Zehnersekunden
-  if (((seconds / 10) % 10) > 4) {
-     leds[4] = CRGB::Yellow;
-     FastLED.show();
-  }
-  
-  else if (((seconds / 10) % 10) > 3) {
-     leds[4] = CRGB::Red;
-     FastLED.show();
-  }
-  
-  else if (((seconds / 10) % 10) > 2) {
-     leds[3] = CRGB::White;
-     FastLED.show();
-  }
-  
-  else if (((seconds / 10) % 10) > 1) {
-     leds[3] = CRGB::Yellow;
-     FastLED.show();
-          
-  }
-  
-  else if (((seconds / 10) % 10) > 0) {
-     leds[3] = CRGB::Red;
-     FastLED.show();
+  if (secondsH > 4) {leds[4] = CRGB::Yellow; leds[3] = CRGB::White;}
+  else if (secondsH > 3) {leds[4] = CRGB::Red; leds[3] = CRGB::White;}
+  else if (secondsH > 2) leds[3] = CRGB::White;
+  else if (secondsH > 1) leds[3] = CRGB::Yellow;
+  else if (secondsH) leds[3] = CRGB::Red;
 
-  }
- 
-  else {
-     leds[3] = CRGB::Black;
-     FastLED.show();
-     leds[4] = CRGB::Black;
-     FastLED.show();
-}
-     
   //Einersekunden
-  if ((seconds % 10) > 8) {
-     leds[2] = CRGB::White;
-     FastLED.show();
-  }
+  if (secondsL > 8) {leds[2] = CRGB::White; leds[1] = CRGB::White; leds[0] = CRGB::White;}
+  else if (secondsL > 7) {leds[2] = CRGB::Yellow; leds[1] = CRGB::White; leds[0] = CRGB::White;}
+  else if (secondsL > 6) {leds[2] = CRGB::Red; leds[1] = CRGB::White; leds[0] = CRGB::White;}
+  else if (secondsL > 5) {leds[1] = CRGB::White; leds[0] = CRGB::White;}
+  else if (secondsL > 4) {leds[1] = CRGB::Yellow; leds[0] = CRGB::White;}
+  else if (secondsL > 3) {leds[1] = CRGB::Red; leds[0] = CRGB::White;}
+  else if (secondsL > 2) leds[0] = CRGB::White;
+  else if (secondsL > 1) leds[0] = CRGB::Yellow;
+  else if (secondsL) leds[0] = CRGB::Red;
 
-  else if ((seconds % 10) > 7) {
-     leds[2] = CRGB::Yellow;
-     FastLED.show();
-  }
-
-  else if ((seconds % 10) > 6) {
-     leds[2] = CRGB::Red;
-     FastLED.show();
-  }
-  
-  else if ((seconds % 10) > 5) {
-     leds[1] = CRGB::White;
-     FastLED.show();
-  }
-  else if ((seconds % 10) > 4) {
-     leds[1] = CRGB::Yellow;
-     FastLED.show();
-  }
-
-  else if ((seconds % 10) > 3) {
-     leds[1] = CRGB::Red;
-     FastLED.show();
-  }
-  
-  else if ((seconds % 10) > 2) {
-     leds[0] = CRGB::White;
-     FastLED.show();
-  }
-
-  else if ((seconds % 10) > 1) {
-     leds[0] = CRGB::Yellow;
-     FastLED.show();
-  }
-
-  else if ((seconds % 10) > 0) {
-     leds[0] = CRGB::Red;
-     FastLED.show();
-  }
-   
-  else {
-     leds[2] = CRGB::Black;
-     FastLED.show();
-     leds[1] = CRGB::Black;
-     FastLED.show();
-     leds[0] = CRGB::Black;
-     FastLED.show();
-}
+  FastLED.show();
+  FastLED.delay(1000);
 }
