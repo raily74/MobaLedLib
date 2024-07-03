@@ -54,65 +54,7 @@ void setup () {
 
   // NTP Client starten
   timeClient.begin();
-
-  leds[0] = CRGB::White;
-     FastLED.show();
-  leds[1] = CRGB::White;
-     FastLED.show();
-  leds[2] = CRGB::White;
-     FastLED.show();
-  leds[3] = CRGB::White;
-     FastLED.show();
-  leds[4] = CRGB::White;
-     FastLED.show();
-  leds[5] = CRGB::White;
-     FastLED.show();
-  leds[6] = CRGB::White;
-     FastLED.show();
-  leds[7] = CRGB::White;
-     FastLED.show();
-  leds[8] = CRGB::White;
-     FastLED.show();
-  leds[9] = CRGB::White;
-     FastLED.show();
-  leds[10] = CRGB::White;
-     FastLED.show();
-  leds[11] = CRGB::White;
-     FastLED.show();
-  leds[12] = CRGB::White;
-     FastLED.show();
-  leds[13] = CRGB::White;
-     FastLED.show();
-  delay(2000);
-  leds[0] = CRGB::Black;
-     FastLED.show();
-  leds[1] = CRGB::Black;
-     FastLED.show();
-  leds[2] = CRGB::Black;
-     FastLED.show();
-  leds[3] = CRGB::Black;
-     FastLED.show();
-  leds[4] = CRGB::Black;
-     FastLED.show();
-  leds[5] = CRGB::Black;
-     FastLED.show();
-  leds[6] = CRGB::Black;
-     FastLED.show();
-  leds[7] = CRGB::Black;
-     FastLED.show();
-  leds[8] = CRGB::Black;
-     FastLED.show();
-  leds[9] = CRGB::Black;
-     FastLED.show();
-  leds[10] = CRGB::Black;
-     FastLED.show();
-  leds[11] = CRGB::Black;
-     FastLED.show();
-  leds[12] = CRGB::Black;
-     FastLED.show();
-  leds[13] = CRGB::Black;
-     FastLED.show();
-  delay(2000);
+  
 /*
   // LED-Streifen initialisieren
   strip.begin();
